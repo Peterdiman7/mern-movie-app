@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import styles from './CommentsSection.module.css'
+import styles from './CommentSection.module.css'
 
 const CommentsSection = ({ movieId }) => {
     const [comments, setComments] = useState([])

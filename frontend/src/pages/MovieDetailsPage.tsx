@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import styles from './MovieDetailsPage.module.css'
+import CommentsSection from '../components/CommentSection'
 
 interface Movie {
     _id: string
@@ -56,6 +57,8 @@ const MovieDetailsPage = () => {
             const data = await response.json()
 
             if (data.success) {
+                // Also clean up comments when movie is deleted
+                localStorage.removeItem(`comments_${movie._id}`)
                 navigate('/')
             } else {
                 alert('Failed to delete movie')
@@ -206,6 +209,11 @@ const MovieDetailsPage = () => {
                         </button>
                     </div>
                 </div>
+            </div>
+
+            {/* Comments Section */}
+            <div className={styles.commentsWrapper}>
+                <CommentsSection movieId={movie._id} />
             </div>
         </div>
     )
