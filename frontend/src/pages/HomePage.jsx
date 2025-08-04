@@ -28,6 +28,7 @@ const HomePage = () => {
                         key={movie._id}
                         title={movie.title}
                         category={movie.category}
+                        id={movie._id}
                         image={movie.image}
                     />
                 ))}
