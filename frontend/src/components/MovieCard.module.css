@@ -1,0 +1,52 @@
+.card {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+    width: 16rem;
+    background-color: white;
+}
+
+.image {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 0.375rem;
+}
+
+.title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-top: 1rem;
+
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+}
+
+.info-btn {
+    background-color: violet;
+    width: 40%;
+    padding: 5px 10px;
+    border-radius: 19px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.delete-btn {
+    background-color: salmon;
+    width: 40%;
+    padding: 5px 10px;
+    border-radius: 19px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.category {
+    font-size: 0.875rem;
+    color: #4b5563;
+}
