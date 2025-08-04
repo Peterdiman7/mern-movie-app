@@ -16,21 +16,27 @@ export const getMovieById = async (req, res) => {
     const id = req.params.id
     console.log("id: ", id)
 
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(404).json({ success: false, message: "Invalid Movie Id!" })
+    }
+
     try {
-        const movies = await Movie.findById(id)
-        res.status(200).json({ success: true, data: movies })
+        const movie = await Movie.findById(id)
+        if (!movie) {
+            return res.status(404).json({ success: false, message: "Movie not found!" })
+        }
+        res.status(200).json({ success: true, data: movie })
     } catch (error) {
-        console.log("Error in fetching movies: ", error.message)
+        console.log("Error in fetching movie: ", error.message)
         res.status(500).json({ success: false, message: "Server Error" })
     }
-    res.send(await Movie.find())
 }
 
 export const createMovie = async (req, res) => {
     const movie = req.body // user sends the data
 
-    if (!movie.title || !movie.category || !movie.image) {
-        return res.status(400).json({ success: false, messages: "Please provide all fields" })
+    if (!movie.title || !movie.category || !movie.image || !movie.description) {
+        return res.status(400).json({ success: false, message: "Please provide all fields" })
     }
 
     const newMovie = new Movie(movie)
@@ -40,7 +46,7 @@ export const createMovie = async (req, res) => {
         res.status(201).json({ success: true, data: newMovie })
     } catch (error) {
         console.log("Error in Create movie: ", error.message)
-        res.status(500).json({ success: false, messages: "Server Error" })
+        res.status(500).json({ success: false, message: "Server Error" })
     }
 }
 
