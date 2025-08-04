@@ -1,5 +1,6 @@
 import mongoose from "mongoose"
 import Movie from "../models/movie.model.js"
+import Comment from "../models/comment.model.js"
 
 export const getMovies = async (req, res) => {
     try {
@@ -76,8 +77,13 @@ export const deleteMovie = async (req, res) => {
     }
 
     try {
+        // First delete all comments associated with this movie
+        await Comment.deleteMany({ movieId: id })
+
+        // Then delete the movie
         await Movie.findByIdAndDelete(id)
-        res.status(200).json({ success: true, message: "Movie Deleted!" })
+
+        res.status(200).json({ success: true, message: "Movie and associated comments deleted!" })
     } catch (error) {
         console.log("Error in deleting movie: ", error.message)
         res.status(500).json({ success: false, message: "Server Error!" })

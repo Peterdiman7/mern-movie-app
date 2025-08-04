@@ -1,4 +1,3 @@
-/* CommentsSection.module.css */
 .commentsContainer {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(20px);
@@ -132,6 +131,33 @@
     to {
         transform: rotate(360deg);
     }
+}
+
+.loadingContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1rem;
+    gap: 1rem;
+    color: #718096;
+}
+
+.loadingContainer .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(113, 128, 150, 0.3);
+    border-top-color: #667eea;
+}
+
+.errorMessage {
+    background: rgba(255, 107, 107, 0.1);
+    border: 1px solid rgba(255, 107, 107, 0.3);
+    color: #e53e3e;
+    padding: 0.75rem;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
 }
 
 .guestMessage {

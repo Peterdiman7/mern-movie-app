@@ -5,22 +5,38 @@ const CommentsSection = ({ movieId }) => {
     const [comments, setComments] = useState([])
     const [newComment, setNewComment] = useState('')
     const [loading, setLoading] = useState(false)
+    const [commentsLoading, setCommentsLoading] = useState(true)
+    const [error, setError] = useState('')
 
     const userMode = localStorage.getItem('userMode') || 'guest'
     const username = localStorage.getItem('username') || ''
 
-    // Load comments from localStorage on component mount
+    // Load comments from MongoDB on component mount
     useEffect(() => {
-        const savedComments = localStorage.getItem(`comments_${movieId}`)
-        if (savedComments) {
-            setComments(JSON.parse(savedComments))
+        const fetchComments = async () => {
+            try {
+                setCommentsLoading(true)
+                const response = await fetch(`/api/comments/movie/${movieId}`)
+                const data = await response.json()
+
+                if (data.success) {
+                    setComments(data.data || [])
+                } else {
+                    console.error('Failed to fetch comments:', data.message)
+                    setComments([])
+                }
+            } catch (error) {
+                console.error('Error fetching comments:', error)
+                setComments([])
+            } finally {
+                setCommentsLoading(false)
+            }
+        }
+
+        if (movieId) {
+            fetchComments()
         }
     }, [movieId])
-
-    // Save comments to localStorage whenever comments change
-    useEffect(() => {
-        localStorage.setItem(`comments_${movieId}`, JSON.stringify(comments))
-    }, [comments, movieId])
 
     const handleSubmitComment = async (e) => {
         e.preventDefault()
@@ -32,29 +48,63 @@ const CommentsSection = ({ movieId }) => {
         }
 
         setLoading(true)
-
-        const comment = {
-            id: Date.now().toString(),
-            text: newComment.trim(),
-            username: username,
-            timestamp: new Date().toISOString(),
-            movieId: movieId
-        }
+        setError('')
 
         try {
-            setComments(prev => [comment, ...prev])
-            setNewComment('')
+            const response = await fetch(`/api/comments/movie/${movieId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    text: newComment.trim(),
+                    username: username
+                })
+            })
+
+            const data = await response.json()
+
+            if (data.success) {
+                // Add the new comment to the beginning of the list
+                setComments(prev => [data.data, ...prev])
+                setNewComment('')
+            } else {
+                setError(data.message || 'Failed to post comment')
+            }
         } catch (error) {
-            console.error('Error adding comment:', error)
+            console.error('Error posting comment:', error)
+            setError('Failed to post comment. Please try again.')
         } finally {
             setLoading(false)
         }
     }
 
-    const handleDeleteComment = (commentId) => {
-        const comment = comments.find(c => c.id === commentId)
-        if (comment && comment.username === username) {
-            setComments(prev => prev.filter(c => c.id !== commentId))
+    const handleDeleteComment = async (commentId) => {
+        if (!window.confirm('Are you sure you want to delete this comment?')) {
+            return
+        }
+
+        try {
+            const response = await fetch(`/api/comments/${commentId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: username
+                })
+            })
+
+            const data = await response.json()
+
+            if (data.success) {
+                setComments(prev => prev.filter(comment => comment._id !== commentId))
+            } else {
+                alert(data.message || 'Failed to delete comment')
+            }
+        } catch (error) {
+            console.error('Error deleting comment:', error)
+            alert('Failed to delete comment. Please try again.')
         }
     }
 
@@ -78,6 +128,20 @@ const CommentsSection = ({ movieId }) => {
         })
     }
 
+    if (commentsLoading) {
+        return (
+            <div className={styles.commentsContainer}>
+                <div className={styles.header}>
+                    <h3 className={styles.title}>💬 Comments</h3>
+                </div>
+                <div className={styles.loadingContainer}>
+                    <div className={styles.spinner}></div>
+                    <p>Loading comments...</p>
+                </div>
+            </div>
+        )
+    }
+
     return (
         <div className={styles.commentsContainer}>
             <div className={styles.header}>
@@ -92,6 +156,9 @@ const CommentsSection = ({ movieId }) => {
                         <span className={styles.userAvatar}>👤</span>
                         <span className={styles.formUsername}>{username}</span>
                     </div>
+
+                    {error && <div className={styles.errorMessage}>{error}</div>}
+
                     <textarea
                         value={newComment}
                         onChange={(e) => setNewComment(e.target.value)}
@@ -136,7 +203,7 @@ const CommentsSection = ({ movieId }) => {
                     </div>
                 ) : (
                     comments.map((comment) => (
-                        <div key={comment.id} className={styles.comment}>
+                        <div key={comment._id} className={styles.comment}>
                             <div className={styles.commentHeader}>
                                 <div className={styles.commentUser}>
                                     <span className={styles.avatar}>👤</span>
@@ -144,12 +211,12 @@ const CommentsSection = ({ movieId }) => {
                                         {comment.username}
                                     </span>
                                     <span className={styles.commentTime}>
-                                        {formatDate(comment.timestamp)}
+                                        {formatDate(comment.createdAt)}
                                     </span>
                                 </div>
                                 {userMode === 'user' && comment.username === username && (
                                     <button
-                                        onClick={() => handleDeleteComment(comment.id)}
+                                        onClick={() => handleDeleteComment(comment._id)}
                                         className={styles.deleteButton}
                                         title="Delete comment"
                                     >
