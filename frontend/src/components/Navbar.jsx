@@ -26,8 +26,19 @@ const Navbar = () => {
 
 				<HStack spacing={2} alignItems={'center'}>
 					<Link to={'/create'}>
-						<Button>
-							zdr
+						<Button
+							bg={'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}
+							color={'white'}
+							_hover={{
+								transform: 'translateY(-2px)',
+								boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)'
+							}}
+							transition={'all 0.3s ease'}
+							borderRadius={'25px'}
+							fontWeight={'600'}
+							px={6}
+						>
+							🎬 Create Movie
 						</Button>
 					</Link>
 				</HStack>
