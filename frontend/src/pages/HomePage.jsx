@@ -8,7 +8,10 @@ const HomePage = () => {
     useEffect(() => {
         const getAllMovies = async () => {
             try {
-                const res = await fetch('/api/movies')
+                const res = await fetch('/api/movies', {
+                    method: 'GET',
+                    cache: 'no-cache'
+                })
                 const data = await res.json()
                 setMovies(data.data)
             } catch (error) {

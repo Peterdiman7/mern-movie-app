@@ -13,6 +13,10 @@ const movieSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    description: {
+        type: String,
+        required: true
+    }
 }, {
     timestamps: true // createdAt, updatedAt
 })

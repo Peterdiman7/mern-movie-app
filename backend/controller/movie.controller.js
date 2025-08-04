@@ -1,8 +1,10 @@
+import mongoose from "mongoose"
 import Movie from "../models/movie.model.js"
 
 export const getMovies = async (req, res) => {
     try {
         const movies = await Movie.find({})
+        res.setHeader('Cache-Control', 'no-store')
         res.status(200).json({ success: true, data: movies })
     } catch (error) {
         console.log("Error in fetching movies: ", error.message)
